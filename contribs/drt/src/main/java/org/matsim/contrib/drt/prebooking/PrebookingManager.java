@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.passenger.DrtStopCandidates;
 import org.matsim.contrib.drt.prebooking.unscheduler.RequestUnscheduler;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -177,15 +178,27 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 		List<Route> routes = personsLegs.stream().map(PersonLeg::leg).map(Leg::getRoute).toList();
 		Route representativeRoute = routes.get(0);
-		PassengerRequest request = requestCreator.createRequest(requestId, personIds, routes,
-			getLink(representativeRoute.getStartLinkId()), getLink(representativeRoute.getEndLinkId()), earliestDepartureTime,
-			now);
+		Link fromLink = getLink(representativeRoute.getStartLinkId());
+		Link toLink = getLink(representativeRoute.getEndLinkId());
 
-		Optional<DrtStopCandidates> stopCandidates = request instanceof DrtRequest ?
-				pendingStopChoices.stopCandidates(personsLegs, routes) :
-				Optional.empty();
-		if (stopCandidates.isPresent()) {
-			request = DrtRequest.newBuilder((DrtRequest)request).stopCandidates(stopCandidates.get()).build();
+		// the stop candidates are part of the request, so they are determined before it is created and reported in its
+		// submitted event
+		Optional<DrtStopCandidates> stopCandidates = pendingStopChoices.stopCandidates(personsLegs, routes);
+		PassengerRequest request;
+		if (requestCreator instanceof DrtRequestCreator drtRequestCreator) {
+			request = drtRequestCreator.createRequest(requestId, personIds, routes, fromLink, toLink,
+					earliestDepartureTime, now, stopCandidates.orElse(null));
+		} else {
+			// other request creators: attach the candidates afterwards (not reported in the submitted event)
+			request = requestCreator.createRequest(requestId, personIds, routes, fromLink, toLink, earliestDepartureTime,
+					now);
+			if (stopCandidates.isPresent()) {
+				if (request instanceof DrtRequest drtRequest) {
+					request = DrtRequest.newBuilder(drtRequest).stopCandidates(stopCandidates.get()).build();
+				} else {
+					stopCandidates = Optional.empty();
+				}
+			}
 		}
 
 		Set<String> violations = requestValidator.validateRequest(request);

@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.StopCandidate;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.StopCandidates;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -66,6 +68,10 @@ public class DrtEventsReadersTest {
 	private final List<Event> drtEvents = List.of(
 			// We do not expect the events reader to construct the DvrpLoad attribute. So we pass null here and just keep the serialized format and the load type id.
 			new DrtRequestSubmittedEvent(0, mode, request, List.of(person), link1, link2, 111, 222, 0.0, 412.0, 512.0, 555, null, "1"),//
+			// with stop candidates (stop selection); no alternative dropoff stops
+			new DrtRequestSubmittedEvent(5, mode, request, List.of(person), link1, link2, 111, 222, 0.0, 412.0, 512.0, 555,
+					null, "1", new StopCandidates(12.5, 30.0,
+					List.of(new StopCandidate(link2, 140.0), new StopCandidate(link1, 260.5)), List.of())),//
 			taskStarted(10, DrtDriveTask.TYPE, 0, link1),//
 			taskEnded(30, DefaultDrtStopTask.TYPE, 1, link2), //
 			taskStarted(50, DrtStayTask.TYPE, 2, link1),//

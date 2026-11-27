@@ -19,10 +19,13 @@
 
 package org.matsim.contrib.drt.passenger.events;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.passenger.DrtStopCandidate;
+import org.matsim.contrib.drt.passenger.DrtStopCandidates;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -44,6 +47,42 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 	public static final String ATTRIBUTE_LATEST_DROPOFF_TIME = "latestDropoffTime";
 	public static final String ATTRIBUTE_MAX_RIDE_DURATION = "maxRideDuration";
 
+	public static final String ATTRIBUTE_ACCESS_WALK_DURATION = "accessWalkDuration";
+	public static final String ATTRIBUTE_EGRESS_WALK_DURATION = "egressWalkDuration";
+	public static final String ATTRIBUTE_ALTERNATIVE_ACCESS_LINKS = "alternativeAccessLinks";
+	public static final String ATTRIBUTE_ALTERNATIVE_ACCESS_WALK_DURATIONS = "alternativeAccessWalkDurations";
+	public static final String ATTRIBUTE_ALTERNATIVE_EGRESS_LINKS = "alternativeEgressLinks";
+	public static final String ATTRIBUTE_ALTERNATIVE_EGRESS_WALK_DURATIONS = "alternativeEgressWalkDurations";
+
+	/**
+	 * A stop at which the passenger could alternatively be picked up or dropped off, with the walking duration
+	 * between the passenger's origin/destination and this stop.
+	 */
+	public record StopCandidate(Id<Link> linkId, double walkDuration) {
+	}
+
+	/**
+	 * The stop candidates of the request: the walking durations to/from the routed stops ({@link #getFromLinkId()},
+	 * {@link #getToLinkId()}) and the alternative pickup and dropoff stops. Which stops were finally chosen is
+	 * reported by the scheduled event.
+	 */
+	public record StopCandidates(double accessWalkDuration, double egressWalkDuration,
+								 List<StopCandidate> alternativeAccess, List<StopCandidate> alternativeEgress) {
+		public StopCandidates {
+			alternativeAccess = List.copyOf(alternativeAccess);
+			alternativeEgress = List.copyOf(alternativeEgress);
+		}
+
+		public static StopCandidates of(DrtStopCandidates candidates) {
+			return new StopCandidates(candidates.accessWalkDuration(), candidates.egressWalkDuration(),
+					toEventCandidates(candidates.alternativeAccess()), toEventCandidates(candidates.alternativeEgress()));
+		}
+
+		private static List<StopCandidate> toEventCandidates(List<DrtStopCandidate> candidates) {
+			return candidates.stream().map(c -> new StopCandidate(c.link().getId(), c.walkDuration())).toList();
+		}
+	}
+
 	private final double unsharedRideTime;
 	private final double unsharedRideDistance;
 
@@ -52,10 +91,24 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 	private final double latestDropoffTime;
 	private final double maxRideDuration;
 
+	@Nullable
+	private final StopCandidates stopCandidates;
+
 	public DrtRequestSubmittedEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
 									Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance,
 									double earliestDepartureTime, double latestPickupTime, double latestDropoffTime, double maxRideDuration,
 									DvrpLoad load, String serializedDvrpLoad) {
+		this(time, mode, requestId, personIds, fromLinkId, toLinkId, unsharedRideTime, unsharedRideDistance,
+				earliestDepartureTime, latestPickupTime, latestDropoffTime, maxRideDuration, load, serializedDvrpLoad, null);
+	}
+
+	/**
+	 * @param stopCandidates the stop candidates of the request, or {@code null} if it has none
+	 */
+	public DrtRequestSubmittedEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
+									Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance,
+									double earliestDepartureTime, double latestPickupTime, double latestDropoffTime, double maxRideDuration,
+									DvrpLoad load, String serializedDvrpLoad, @Nullable StopCandidates stopCandidates) {
 		super(time, mode, requestId, personIds, fromLinkId, toLinkId, load, serializedDvrpLoad);
 		this.unsharedRideTime = unsharedRideTime;
 		this.unsharedRideDistance = unsharedRideDistance;
@@ -63,6 +116,7 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		this.latestPickupTime = latestPickupTime;
 		this.latestDropoffTime = latestDropoffTime;
 		this.maxRideDuration = maxRideDuration;
+		this.stopCandidates = stopCandidates;
 	}
 
 	@Override
@@ -99,6 +153,14 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 	public double getMaxRideDuration() {
 		return maxRideDuration;
 	}
+
+	/**
+	 * @return the stop candidates of the request, empty if it has none (no stop selection)
+	 */
+	public Optional<StopCandidates> getStopCandidates() {
+		return Optional.ofNullable(stopCandidates);
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
@@ -108,6 +170,14 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		attr.put(ATTRIBUTE_LATEST_PICKUP_TIME, latestPickupTime + "");
 		attr.put(ATTRIBUTE_LATEST_DROPOFF_TIME, latestDropoffTime + "");
 		attr.put(ATTRIBUTE_MAX_RIDE_DURATION, maxRideDuration + "");
+		if (stopCandidates != null) {
+			attr.put(ATTRIBUTE_ACCESS_WALK_DURATION, stopCandidates.accessWalkDuration() + "");
+			attr.put(ATTRIBUTE_EGRESS_WALK_DURATION, stopCandidates.egressWalkDuration() + "");
+			attr.put(ATTRIBUTE_ALTERNATIVE_ACCESS_LINKS, joinLinks(stopCandidates.alternativeAccess()));
+			attr.put(ATTRIBUTE_ALTERNATIVE_ACCESS_WALK_DURATIONS, joinWalkDurations(stopCandidates.alternativeAccess()));
+			attr.put(ATTRIBUTE_ALTERNATIVE_EGRESS_LINKS, joinLinks(stopCandidates.alternativeEgress()));
+			attr.put(ATTRIBUTE_ALTERNATIVE_EGRESS_WALK_DURATIONS, joinWalkDurations(stopCandidates.alternativeEgress()));
+		}
 		return attr;
 	}
 
@@ -132,6 +202,45 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		String serializedLoad  = attributes.get(ATTRIBUTE_LOAD);
 		return new DrtRequestSubmittedEvent(time, mode, requestId, personIds, fromLinkId, toLinkId, unsharedRideTime,
 				unsharedRideDistance, earliestDepartureTime, latestPickupTime, latestDropoffTime, maxRideDuration,
-			null, serializedLoad);
+			null, serializedLoad, parseStopCandidates(attributes));
+	}
+
+	// lists are comma-separated, like the person ids of the event
+	private static String joinLinks(List<StopCandidate> candidates) {
+		return String.join(",", candidates.stream().map(c -> c.linkId().toString()).toList());
+	}
+
+	private static String joinWalkDurations(List<StopCandidate> candidates) {
+		return String.join(",", candidates.stream().map(c -> c.walkDuration() + "").toList());
+	}
+
+	@Nullable
+	private static StopCandidates parseStopCandidates(Map<String, String> attributes) {
+		if (!attributes.containsKey(ATTRIBUTE_ACCESS_WALK_DURATION)) {
+			return null; // no stop candidates, or written before they were reported
+		}
+		return new StopCandidates(Double.parseDouble(attributes.get(ATTRIBUTE_ACCESS_WALK_DURATION)),
+				Double.parseDouble(attributes.get(ATTRIBUTE_EGRESS_WALK_DURATION)),
+				parseCandidates(attributes.get(ATTRIBUTE_ALTERNATIVE_ACCESS_LINKS),
+						attributes.get(ATTRIBUTE_ALTERNATIVE_ACCESS_WALK_DURATIONS)),
+				parseCandidates(attributes.get(ATTRIBUTE_ALTERNATIVE_EGRESS_LINKS),
+						attributes.get(ATTRIBUTE_ALTERNATIVE_EGRESS_WALK_DURATIONS)));
+	}
+
+	private static List<StopCandidate> parseCandidates(String links, String walkDurations) {
+		if (links == null || links.isEmpty()) {
+			return List.of();
+		}
+		String[] linkIds = links.split(",");
+		String[] durations = walkDurations.split(",");
+		if (linkIds.length != durations.length) {
+			throw new IllegalArgumentException(
+					"Stop candidate links and walk durations differ in length: " + links + " / " + walkDurations);
+		}
+		List<StopCandidate> candidates = new ArrayList<>(linkIds.length);
+		for (int i = 0; i < linkIds.length; i++) {
+			candidates.add(new StopCandidate(Id.createLinkId(linkIds[i]), Double.parseDouble(durations[i])));
+		}
+		return candidates;
 	}
 }

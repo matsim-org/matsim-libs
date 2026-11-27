@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.passenger;
 
 import com.google.common.base.Preconditions;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -57,6 +58,17 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, List<Route> routes, Link fromLink, Link toLink,
 									double departureTime, double submissionTime) {
+		return createRequest(id, passengerIds, routes, fromLink, toLink, departureTime, submissionTime, null);
+	}
+
+	/**
+	 * Creates a request with stop candidates (stop selection). The candidates are part of the request and reported
+	 * in its {@link DrtRequestSubmittedEvent}.
+	 *
+	 * @param stopCandidates the stop candidates of the request, or {@code null} if it has none
+	 */
+	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, List<Route> routes, Link fromLink, Link toLink,
+									double departureTime, double submissionTime, @Nullable DrtStopCandidates stopCandidates) {
 
 		double maxWaitDuration = Double.POSITIVE_INFINITY;
 		double maxTravelDuration = Double.POSITIVE_INFINITY;
@@ -99,7 +111,8 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance(),
 						departureTime, departureTime + maxWaitDuration,
 						departureTime + maxTravelDuration, maxRideDuration,
-						load, serializedLoad)
+						load, serializedLoad,
+						stopCandidates == null ? null : DrtRequestSubmittedEvent.StopCandidates.of(stopCandidates))
 		);
 
 		DrtRequest request = DrtRequest.newBuilder()
@@ -112,6 +125,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.constraints(consolidatedConstrains)
 				.submissionTime(submissionTime)
 				.load(load)
+				.stopCandidates(stopCandidates)
 				.build();
 
 		log.debug(drtRoute);
