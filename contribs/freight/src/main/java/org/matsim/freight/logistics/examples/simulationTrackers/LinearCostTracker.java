@@ -23,6 +23,8 @@ package org.matsim.freight.logistics.examples.simulationTrackers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -71,6 +73,8 @@ import org.matsim.freight.logistics.LogisticChain;
   private double linearUnitCosts;
   private LogisticChain logisticChain;
 
+  private static final Logger log = LogManager.getLogger(LinearCostTracker.class);
+
   public LinearCostTracker(double shareOfFixedCosts) {
     this.shareOfFixedCosts = shareOfFixedCosts;
       this.eventHandlers = new ArrayList<>();
@@ -95,7 +99,7 @@ import org.matsim.freight.logistics.LogisticChain;
       }
       if (handler instanceof CollectionServiceHandler collectionHandler) {
         totalNumberOfShipments = collectionHandler.getTotalNumberOfShipments();
-        System.out.println(totalNumberOfShipments);
+        log.info(String.valueOf(totalNumberOfShipments));
         totalWeightOfShipments = collectionHandler.getTotalWeightOfShipments();
         loadingCosts = collectionHandler.getTotalLoadingCosts();
       }

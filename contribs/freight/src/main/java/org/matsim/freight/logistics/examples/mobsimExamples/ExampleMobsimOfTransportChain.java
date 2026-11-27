@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,6 +60,8 @@ import org.matsim.vehicles.VehicleUtils;
  * assigned, scheduled, and simulated.
  */
 /*package-private*/ class ExampleMobsimOfTransportChain {
+
+  private static final Logger log = LogManager.getLogger(ExampleMobsimOfTransportChain.class);
 
   private static LSP createInitialLSP(Scenario scenario) {
 
@@ -372,7 +376,7 @@ import org.matsim.vehicles.VehicleUtils;
     controller.run();
 
     for (LspShipment lspShipment : lsp.getLspShipments()) {
-      System.out.println("Shipment: " + lspShipment.getId());
+      log.info("Shipment: {}", lspShipment.getId());
       ArrayList<LspShipmentPlanElement> scheduleElements =
           new ArrayList<>(
               LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
@@ -389,7 +393,7 @@ import org.matsim.vehicles.VehicleUtils;
                   .getPlanElements()
                   .size();
           i++) {
-        System.out.println(
+        log.info(
             "Scheduled: "
                 + scheduleElements.get(i).getLogisticChainElement().getId()
                 + "  "
@@ -401,9 +405,9 @@ import org.matsim.vehicles.VehicleUtils;
                 + " End: "
                 + scheduleElements.get(i).getEndTime());
       }
-      System.out.println();
+      log.info("");
       for (int i = 0; i < lspShipment.getShipmentLog().getPlanElements().size(); i++) {
-        System.out.println(
+        log.info(
             "Logged: "
                 + logElements.get(i).getLogisticChainElement().getId()
                 + "  "
@@ -415,7 +419,7 @@ import org.matsim.vehicles.VehicleUtils;
                 + " End: "
                 + logElements.get(i).getEndTime());
       }
-      System.out.println();
+      log.info("");
     }
   }
 }

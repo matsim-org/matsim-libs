@@ -85,8 +85,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 	 */
 	List<Plan> createFreightDriverPlans() {
 		clear();
-		System.out.flush();
-		System.err.flush() ;
+		log.debug("Creating freight driver plans for carrier {}", carrier.getId());
 		if (carrier.getSelectedPlan() == null) {
 			return Collections.emptyList();
 		}

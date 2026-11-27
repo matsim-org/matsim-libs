@@ -56,6 +56,8 @@ import org.matsim.vehicles.VehicleUtils;
  */
 /*package-private*/ final class ExampleLSPScoring {
 
+  private static final Logger log = LogManager.getLogger(ExampleLSPScoring.class);
+
   private ExampleLSPScoring() {}
 
   private static LSP createLSPWithScorer(Scenario scenario) {
@@ -176,7 +178,7 @@ import org.matsim.vehicles.VehicleUtils;
     controller.run();
 
     for (LSP lsp2 : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-      System.out.println("The tip of all customers was: " + lsp2.getSelectedPlan().getScore());
+      log.info("The tip of all customers was: " + lsp2.getSelectedPlan().getScore());
     }
   }
 

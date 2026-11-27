@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,6 +52,8 @@ import org.matsim.vehicles.VehicleUtils;
  * schedulers, then prints the scheduled {@link LspShipmentPlanElement}s.
  */
 /*package-private*/ class ExampleSchedulingOfInitialPlan {
+
+  private static final Logger log = LogManager.getLogger(ExampleSchedulingOfInitialPlan.class);
 
   private static LSP createInitialLSP(Scenario scenario) {
 
@@ -180,7 +184,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     // print the schedules for the assigned LSPShipments
     for (LspShipment lspShipment : lspShipments) {
-      System.out.println("Shipment: " + lspShipment.getId());
+      log.info("Shipment: {}", lspShipment.getId());
       ArrayList<LspShipmentPlanElement> scheduleElements =
           new ArrayList<>(
               LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
@@ -195,8 +199,7 @@ import org.matsim.vehicles.VehicleUtils;
           LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), lspShipment.getId())
               .getPlanElements()
               .values()) {
-        System.out.println(
-            //					"Solution Id: " + element.getSolutionElement().getEmbeddingContainer().getId() +
+        log.info(
             " LogisticChainElement Id: "
                 + element.getLogisticChainElement().getId()
                 + " Resource Id: "
@@ -208,7 +211,7 @@ import org.matsim.vehicles.VehicleUtils;
                 + " End Time: "
                 + element.getEndTime());
       }
-      System.out.println();
+      log.info("");
     }
   }
 }

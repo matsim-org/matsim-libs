@@ -59,8 +59,11 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
+	private static final Logger log = LogManager.getLogger(RepeatedMultipleShipmentsCompleteLSPMobsimTest.class);
 
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -319,16 +322,16 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 				for (LspShipmentPlanElement scheduleElement : scheduleElements) {
 					LspShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 					if (!scheduleElement.getElementType().equals(logElement.getElementType())) {
-						System.out.println(scheduleElement.getElementType());
-						System.out.println(logElement.getElementType());
+						log.info(scheduleElement.getElementType());
+						log.info(logElement.getElementType());
 						for (int j = 0; j < LspShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size(); j++) {
-							System.out.println("Scheduled: " + scheduleElements.get(j).getLogisticChainElement().getId() + "  " + scheduleElements.get(j).getResourceId() + "  " + scheduleElements.get(j).getElementType() + " Start: " + scheduleElements.get(j).getStartTime() + " End: " + scheduleElements.get(j).getEndTime());
+							log.info("Scheduled: " + scheduleElements.get(j).getLogisticChainElement().getId() + "  " + scheduleElements.get(j).getResourceId() + "  " + scheduleElements.get(j).getElementType() + " Start: " + scheduleElements.get(j).getStartTime() + " End: " + scheduleElements.get(j).getEndTime());
 						}
-						System.out.println();
+						log.info();
 						for (int j = 0; j < shipment.getShipmentLog().getPlanElements().size(); j++) {
-							System.out.println("Logged: " + logElements.get(j).getLogisticChainElement().getId() + "  " + logElements.get(j).getResourceId() + "  " + logElements.get(j).getElementType() + " Start: " + logElements.get(j).getStartTime() + " End: " + logElements.get(j).getEndTime());
+							log.info("Logged: " + logElements.get(j).getLogisticChainElement().getId() + "  " + logElements.get(j).getResourceId() + "  " + logElements.get(j).getElementType() + " Start: " + logElements.get(j).getStartTime() + " End: " + logElements.get(j).getEndTime());
 						}
-						System.out.println();
+						log.info();
 					}
 
 					assertEquals(scheduleElement.getElementType(), logElement.getElementType());

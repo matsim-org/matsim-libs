@@ -58,6 +58,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class is deprecated and will be removed in the future.
@@ -73,6 +75,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 @Deprecated
 public class CollectionLSPReplanningTest {
+	private static final Logger log = LogManager.getLogger(CollectionLSPReplanningTest.class);
 
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -220,7 +223,7 @@ public class CollectionLSPReplanningTest {
 
 	@Test
 	public void testCollectionLSPReplanning() {
-		System.out.println(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLspShipmentIds().size());
+		log.info(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLspShipmentIds().size());
 		assertTrue(collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLspShipmentIds().size() < 20);
 	}
 

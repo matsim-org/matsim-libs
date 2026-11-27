@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,6 +55,8 @@ import org.matsim.vehicles.VehicleUtils;
  */
 
 /*package-private*/ class ExampleSchedulingOfTransportChain {
+
+  private static final Logger log = LogManager.getLogger(ExampleSchedulingOfTransportChain.class);
 
   private static LSP createInitialLSP(Scenario scenario) {
 
@@ -348,9 +352,9 @@ import org.matsim.vehicles.VehicleUtils;
                   .getPlanElements()
                   .values());
       elementList.sort(LspShipmentUtils.createShipmentPlanElementComparator());
-      System.out.println("Shipment: " + lspShipment.getId());
+      log.info("Shipment: {}", lspShipment.getId());
       for (LspShipmentPlanElement element : elementList) {
-        System.out.println(
+        log.info(
             element.getLogisticChainElement().getId()
                 + "\t\t"
                 + element.getResourceId()
@@ -361,7 +365,7 @@ import org.matsim.vehicles.VehicleUtils;
                 + "\t\t"
                 + element.getEndTime());
       }
-      System.out.println();
+      log.info("");
     }
 
     //		for (LSPResource lspResource : lsp.getResources()) {

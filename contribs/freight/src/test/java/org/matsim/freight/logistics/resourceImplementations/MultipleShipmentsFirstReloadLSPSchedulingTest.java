@@ -51,8 +51,11 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MultipleShipmentsFirstReloadLSPSchedulingTest {
+	private static final Logger log = LogManager.getLogger(MultipleShipmentsFirstReloadLSPSchedulingTest.class);
 	private LSP lsp;
 	private LSPResource firstTranshipmentHubResource;
 	private LogisticChainElement firstHubElement;
@@ -195,11 +198,11 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			ArrayList<LspShipmentPlanElement> scheduleElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
 
-			System.out.println();
+			log.info();
 			for (int i = 0; i < LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size(); i++) {
-				System.out.println("Scheduled: " + scheduleElements.get(i).getLogisticChainElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
+				log.info("Scheduled: " + scheduleElements.get(i).getLogisticChainElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
 			}
-			System.out.println();
+			log.info();
 		}
 
 

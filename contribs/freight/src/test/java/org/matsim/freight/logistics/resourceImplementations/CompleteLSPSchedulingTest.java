@@ -52,8 +52,11 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CompleteLSPSchedulingTest {
+	private static final Logger log = LogManager.getLogger(CompleteLSPSchedulingTest.class);
 
 	private LSP lsp;
 	private LSPResource collectionResource;
@@ -283,11 +286,11 @@ public class CompleteLSPSchedulingTest {
 		for (LspShipment shipment : lsp.getLspShipments()) {
 			ArrayList<LspShipmentPlanElement> elementList = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			elementList.sort(LspShipmentUtils.createShipmentPlanElementComparator());
-			System.out.println();
+			log.info();
 			for (LspShipmentPlanElement element : elementList) {
-				System.out.println(element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime());
+				log.info(element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime());
 			}
-			System.out.println();
+			log.info();
 		}
 
 		ArrayList<LogisticChainElement> chainElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());

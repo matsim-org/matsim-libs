@@ -242,7 +242,7 @@ public class CarrierControllerUtilsTest{
 		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
-			System.out.println("Found Shipment1");
+			log.info("Found Shipment1");
 			foundShipment1 = true;
 			Assertions.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getPickupLinkId());
 			Assertions.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment1.getDeliveryLinkId());
@@ -257,7 +257,7 @@ public class CarrierControllerUtilsTest{
 		CarrierShipment carrierShipment2 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment2", CarrierShipment.class));
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
-			System.out.println("Found Shipment2");
+			log.info("Found Shipment2");
 			foundShipment2 = true;
 			Assertions.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getPickupLinkId());
 			Assertions.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment2.getDeliveryLinkId());

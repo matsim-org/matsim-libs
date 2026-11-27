@@ -265,7 +265,7 @@ public class CollectionTrackerTest {
 				for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * scheduledTour.getVehicle().getType().getCostInformation().getCostsPerMeter();
 					for (TourElement element : scheduledTour.getTour().getTourElements()) {
-						System.out.println(element);
+						log.info(element);
 						if (element instanceof Leg leg) {
 							NetworkRoute linkRoute = (NetworkRoute) leg.getRoute();
 							for (Id<Link> linkId : linkRoute.getLinkIds()) {
