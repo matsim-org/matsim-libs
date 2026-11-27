@@ -1418,6 +1418,9 @@ message(
     paste0(" | Failed: ", paste(failed_opportunities, collapse = ", "))
 )
 
+source("~/git/matsim-libs/contribs/accessibility/src/main/R/THESIS/debug_tmap.R")                      # all persons, pan/zoom in the Viewer
+view_persons(sample_n = 20000, shape_by = "economic_status")        # if it's slow
+
 # source("debug_tmap.R")   # once per session
 # 
 # lichtenberg_x <- 805074

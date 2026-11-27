@@ -85,7 +85,8 @@ add_income_level <- function(persons) {
           as.character(income) %in% income_levels$Medium ~ "Medium",
           as.character(income) %in% income_levels$High   ~ "High"
         ),
-        levels = names(income_levels)
+        # legend order: High, Medium, Low
+        levels = rev(names(income_levels))
       )
     ) %>%
     distinct(personId, .keep_all = TRUE)
@@ -118,6 +119,19 @@ view_persons <- function(persons = mm_persons,
       select(-any_of(shape_by)) %>%
       left_join(attrs %>% select(personId, all_of(shape_by)), by = "personId") %>%
       mutate(across(all_of(shape_by), ~ factor(.x)))
+    # economic_status has five classes in the MATSim persons file; group them
+    # into three, listed High, Medium, Low in the legend
+    if (identical(shape_by, "economic_status")) {
+      persons <- persons %>%
+        mutate(economic_status = factor(
+          case_when(
+            economic_status %in% c("very_high", "high") ~ "High",
+            economic_status == "medium"                 ~ "Medium",
+            economic_status %in% c("low", "very_low")   ~ "Low"
+          ),
+          levels = c("High", "Medium", "Low")
+        ))
+    }
     matched <- mean(persons$personId %in% attrs$personId) * 100
     message(round(matched, 1), "% of mapped persons found in ",
             basename(persons_attr_file))
@@ -161,7 +175,11 @@ view_persons <- function(persons = mm_persons,
         fill.scale = delta_scale,
         shape = shape_by,
         # shape.scale = tm_scale_categorical(values = c(21, 22, 24, 23, 25)),
-        shape.scale = tm_scale_categorical(values = c(25, 21, 24)),
+        # same shapes per group as before (High = up, Medium = circle, Low = down),
+        # listed in the legend order High, Medium, Low
+        shape.scale = tm_scale_categorical(values = c(24, 21, 25)),
+        # delta legend drawn with circles, not the first group's shape
+        fill.legend = tm_legend(shape = 21),
         size = 0.9,
         popup.vars = popup
       )
