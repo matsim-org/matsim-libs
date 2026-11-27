@@ -48,6 +48,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     private final OccupancyData occupancyData;
     private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
     private final RaptorTransferCostCalculator transferCostCalculator;
+    private final RaptorTimetableProvider timetableProvider;
 
     private final Network network;
 
@@ -57,6 +58,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
                                   Provider<RaptorStopFinder> stopFinderProvider, OccupancyData occupancyData,
                                   RaptorInVehicleCostCalculator inVehicleCostCalculator,
                                   RaptorTransferCostCalculator transferCostCalculator,
+                                  RaptorTimetableProvider timetableProvider,
                                   final EventsManager events) {
         this.schedule = scenario.getTransitSchedule();
         this.transitVehicles = scenario.getTransitVehicles();
@@ -68,6 +70,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
         this.occupancyData = occupancyData;
         this.inVehicleCostCalculator = inVehicleCostCalculator;
         this.transferCostCalculator = transferCostCalculator;
+        this.timetableProvider = timetableProvider;
 
         if (events != null) {
             events.addHandler((TransitScheduleChangedEventHandler) event -> this.data = null);
@@ -77,7 +80,8 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     @Override
     public SwissRailRaptor get() {
         SwissRailRaptorData data = getData();
-        return new SwissRailRaptor(data, this.raptorParametersForPerson, this.routeSelector, this.stopFinderProvider.get(), this.inVehicleCostCalculator, this.transferCostCalculator);
+        return new SwissRailRaptor(data, this.raptorParametersForPerson, this.routeSelector, this.stopFinderProvider.get(), this.inVehicleCostCalculator, this.transferCostCalculator,
+            this.timetableProvider);
     }
 
     private SwissRailRaptorData getData() {

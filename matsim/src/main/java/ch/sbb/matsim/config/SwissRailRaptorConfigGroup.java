@@ -59,6 +59,10 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_USE_CAPACITY_CONSTRAINTS = "useCapacityConstraints";
     private static final String PARAM_USE_CAPACITY_CONSTRAINTS_DESC = "If true, SwissRailRaptor tries to detect when agents cannot board a vehicle in the previous iteration because it is already full and tries to find an alternative route instead.";
 
+    private static final String PARAM_USE_TIMETABLE_UPDATES = "useTimetableUpdates";
+    private static final String PARAM_USE_TIMETABLE_UPDATES_DESC = "If true, the times of the departures may differ from the transit schedule, per departure and stop (e.g. delays), as long as the departures of a route do not overtake each other. "
+        + "The transfers are then calculated without assumptions on the times. Cannot be combined with useRangeQuery, useCapacityConstraints or chained departures.";
+
     private static final String PARAM_TRANSFER_WALK_MARGIN = "transferWalkMargin";
     private static final String PARAM_TRANSFER_WALK_MARGIN_DESC = "time deducted from transfer walk leg during transfers between pt legs in order to avoid missing a vehicle by a few seconds due to delays.";
     private static final String PARAM_INTERMODAL_LEG_ONLYHANDLING = "intermodalLegOnlyHandling";
@@ -71,6 +75,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private IntermodalAccessEgressModeSelection intermodalAccessEgressModeSelection = IntermodalAccessEgressModeSelection.CalcLeastCostModePerStop;
     private boolean useModeMapping = false;
     private boolean useCapacityConstraints = false;
+    private boolean useTimetableUpdates = false;
 
     private double transferPenaltyBaseCost = 0;
     private double transferPenaltyMinCost = Double.NEGATIVE_INFINITY;
@@ -206,6 +211,16 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     @StringSetter(PARAM_USE_CAPACITY_CONSTRAINTS)
     public void setUseCapacityConstraints(boolean useCapacityConstraints) {
         this.useCapacityConstraints = useCapacityConstraints;
+    }
+
+    @StringGetter(PARAM_USE_TIMETABLE_UPDATES)
+    public boolean isUseTimetableUpdates() {
+        return this.useTimetableUpdates;
+    }
+
+    @StringSetter(PARAM_USE_TIMETABLE_UPDATES)
+    public void setUseTimetableUpdates(boolean useTimetableUpdates) {
+        this.useTimetableUpdates = useTimetableUpdates;
     }
 
     @StringGetter(PARAM_SCORING_PARAMETERS)
@@ -726,6 +741,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 		comments.put(PARAM_USE_INTERMODAL_ACCESS_EGRESS, PARAM_USE_INTERMODAL_ACCESS_EGRESS_DESC);
         comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
         comments.put(PARAM_USE_CAPACITY_CONSTRAINTS, PARAM_USE_CAPACITY_CONSTRAINTS_DESC);
+        comments.put(PARAM_USE_TIMETABLE_UPDATES, PARAM_USE_TIMETABLE_UPDATES_DESC);
         comments.put(PARAM_TRANSFER_WALK_MARGIN, PARAM_TRANSFER_WALK_MARGIN_DESC);
 		comments.put(PARAM_TRANSFER_CALCULATION, PARAM_TRANFER_CALCULATION_DESC);
         return comments;
@@ -734,6 +750,11 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     // TODO: add more
 	@Override
 	protected void checkConsistency(Config config) {
+
+		if (useTimetableUpdates) {
+			Verify.verify(!useRangeQuery, PARAM_USE_TIMETABLE_UPDATES + " cannot be combined with " + PARAM_USE_RANGE_QUERY + ".");
+			Verify.verify(!useCapacityConstraints, PARAM_USE_TIMETABLE_UPDATES + " cannot be combined with " + PARAM_USE_CAPACITY_CONSTRAINTS + ".");
+		}
 
 		if (useIntermodality) {
 

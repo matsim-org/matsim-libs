@@ -93,6 +93,8 @@ public class RaptorStaticConfig {
 
     private boolean useCapacityConstraints = false;
 
+    private boolean useTimetableUpdates = false;
+
     private RaptorOptimization optimization = RaptorOptimization.OneToOneRouting;
     private RaptorTransferCalculation transferCalculation = RaptorTransferCalculation.Initial;
 
@@ -166,6 +168,19 @@ public class RaptorStaticConfig {
 
     public void setUseCapacityConstraints(boolean useCapacityConstraints) {
         this.useCapacityConstraints = useCapacityConstraints;
+    }
+
+    /**
+     * Whether the times of the departures may differ from the transit schedule, per departure and route stop, as
+     * long as the departures of a route do not overtake each other. The transfers are then calculated without
+     * assumptions on the times.
+     */
+    public boolean isUseTimetableUpdates() {
+        return this.useTimetableUpdates;
+    }
+
+    public void setUseTimetableUpdates(boolean useTimetableUpdates) {
+        this.useTimetableUpdates = useTimetableUpdates;
     }
 
     public void addModeMappingForPassengers(String routeMode, String passengerMode) {
