@@ -488,6 +488,7 @@ public class PrebookingTestEnvironment {
 
 		public List<Double> submissionTimes = new LinkedList<>();
 		public Id<org.matsim.contrib.dvrp.optimizer.Request> drtRequestId = null;
+		public DrtRequestSubmittedEvent submittedEvent = null;
 	}
 
 	private Map<String, RequestInfo> requestInfo = new HashMap<>();
@@ -516,6 +517,7 @@ public class PrebookingTestEnvironment {
 						.getRequestId();
 				requestInfo.computeIfAbsent(personId.toString(), id -> new RequestInfo()).submissionTimes
 						.add(event.getTime());
+				requestInfo.computeIfAbsent(personId.toString(), id -> new RequestInfo()).submittedEvent = event;
 			}
 		}
 

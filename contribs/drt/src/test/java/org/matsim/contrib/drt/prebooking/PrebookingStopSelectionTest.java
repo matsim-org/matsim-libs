@@ -39,6 +39,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.StopCandidate;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -81,11 +83,20 @@ public class PrebookingStopSelectionTest {
 		assertThat(result.drtDepartures).extracting(e -> e.getLinkId()).containsExactly(STOP_A);
 		assertThat(result.finalArrivalLinks).containsExactly(DESTINATION);
 		assertThat(result.stuck).isEmpty();
+		assertThat(result.submitted.getStopCandidates()).isEmpty();
 	}
 
 	@Test
 	void testTwoCandidatesPickUpAtTheCheaperStop() {
 		Result result = runPickup(2, LATE_BOOKING);
+
+		// the submitted event reports the routed stops and the alternatives that were offered to the optimizer
+		assertThat(result.submitted.getFromLinkId()).isEqualTo(STOP_A);
+		assertThat(result.submitted.getStopCandidates()).hasValueSatisfying(candidates -> {
+			assertThat(candidates.accessWalkDuration()).isEqualTo(0, offset(1.0));
+			assertThat(candidates.alternativeAccess()).extracting(StopCandidate::linkId).containsExactly(STOP_B);
+			assertThat(candidates.alternativeAccess().getFirst().walkDuration()).isEqualTo(312, offset(1.0));
+		});
 
 		assertThat(result.drtDepartures).extracting(e -> e.getLinkId()).containsExactly(STOP_B);
 		// the agent walked to B: 200 m beeline * 1.3 at the default walk speed of 3 km/h
@@ -107,6 +118,7 @@ public class PrebookingStopSelectionTest {
 		assertThat(result.originActivityEnds).containsExactly(DEPARTURE_TIME);
 		assertThat(result.finalArrivalLinks).containsExactly(DESTINATION);
 		assertThat(result.stuck).isEmpty();
+		assertThat(result.submitted.getStopCandidates()).isEmpty();
 		assertThat(drtLeg(result.person).getRoute()).isInstanceOfSatisfying(DrtRoute.class,
 				route -> assertThat(route.getStopCandidates()).isPresent());
 	}
@@ -248,7 +260,7 @@ public class PrebookingStopSelectionTest {
 
 	private record Result(List<PersonDepartureEvent> drtDepartures, List<Id<Link>> drtArrivalLinks,
 						  List<Id<Link>> finalArrivalLinks, List<Double> originActivityEnds, List<?> stuck,
-						  Person person, boolean rejected) {
+						  Person person, boolean rejected, DrtRequestSubmittedEvent submitted) {
 	}
 
 	private static org.assertj.core.data.Offset<Double> offset(double value) {
@@ -313,7 +325,8 @@ public class PrebookingStopSelectionTest {
 		Person person = controller.getScenario().getPopulation().getPersons().get(Id.createPersonId("personA"));
 		return new Result(handler.drtDepartures, handler.drtArrivalLinks, handler.finalArrivalLinks,
 				handler.originActivityEnds, environment.getStuckInfo(), person,
-				environment.getRequestInfo().get("personA").rejected);
+				environment.getRequestInfo().get("personA").rejected,
+				environment.getRequestInfo().get("personA").submittedEvent);
 	}
 
 	private record Handler(List<PersonDepartureEvent> drtDepartures, List<Id<Link>> drtArrivalLinks,
