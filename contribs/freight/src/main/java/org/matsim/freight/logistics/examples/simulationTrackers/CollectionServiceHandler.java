@@ -23,6 +23,8 @@ package org.matsim.freight.logistics.examples.simulationTrackers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.CarrierService;
@@ -41,6 +43,8 @@ import org.matsim.vehicles.Vehicles;
  */
 /*package-private*/ class CollectionServiceHandler
 	implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
+
+	private static final Logger log = LogManager.getLogger(CollectionServiceHandler.class);
 
 	private final Collection<ServiceTuple> tuples;
 	private final Vehicles allVehicles;
@@ -74,7 +78,7 @@ import org.matsim.vehicles.Vehicles;
 	 */
 	@Override
 	public void handleEvent(CarrierServiceEndEvent event) {
-		System.out.println("Service Ends");
+		log.info("Service Ends");
 		double loadingCosts;
 		for (ServiceTuple tuple : tuples) {
 			if (tuple.serviceId() == event.getServiceId()) {

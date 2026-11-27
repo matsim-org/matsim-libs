@@ -47,7 +47,6 @@ import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.LSPUtils.LogisticChainElementBuilder;
 import org.matsim.freight.logistics.examples.LogisticsExampleUtils;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.shipment.LspShipment;

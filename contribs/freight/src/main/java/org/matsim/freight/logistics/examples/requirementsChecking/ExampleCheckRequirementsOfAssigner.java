@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -71,6 +73,8 @@ import org.matsim.vehicles.VehicleUtils;
  * RequirementsAssigner} then only admits a shipment to a chain that satisfies its requirement.
  */
 class ExampleCheckRequirementsOfAssigner {
+
+  private static final Logger log = LogManager.getLogger(ExampleCheckRequirementsOfAssigner.class);
 
   static final String ATTRIBUTE_COLOR = "color";
 
@@ -249,7 +253,7 @@ class ExampleCheckRequirementsOfAssigner {
                 break;
             }
         }
-        System.out.println("All lspShipments in " + logisticChain.getId() + " are red");
+        log.info("All lspShipments in {} are red", logisticChain.getId());
       }
       if (logisticChain.getId().toString().equals("BlueChain")) {
         for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
@@ -258,7 +262,7 @@ class ExampleCheckRequirementsOfAssigner {
                 break;
             }
         }
-        System.out.println("All lspShipments in " + logisticChain.getId() + " are blue");
+        log.info("All lspShipments in {} are blue", logisticChain.getId());
       }
     }
   }

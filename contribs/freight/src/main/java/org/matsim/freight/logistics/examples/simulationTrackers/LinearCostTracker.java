@@ -23,6 +23,8 @@ package org.matsim.freight.logistics.examples.simulationTrackers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -71,6 +73,8 @@ import org.matsim.freight.logistics.LogisticChain;
   private double linearUnitCosts;
   private LogisticChain logisticChain;
 
+  private static final Logger log = LogManager.getLogger(LinearCostTracker.class);
+
   public LinearCostTracker(double shareOfFixedCosts) {
     this.shareOfFixedCosts = shareOfFixedCosts;
       this.eventHandlers = new ArrayList<>();
@@ -95,7 +99,7 @@ import org.matsim.freight.logistics.LogisticChain;
       }
       if (handler instanceof CollectionServiceHandler collectionHandler) {
         totalNumberOfShipments = collectionHandler.getTotalNumberOfShipments();
-        System.out.println(totalNumberOfShipments);
+        log.info(String.valueOf(totalNumberOfShipments));
         totalWeightOfShipments = collectionHandler.getTotalWeightOfShipments();
         loadingCosts = collectionHandler.getTotalLoadingCosts();
       }
@@ -109,8 +113,9 @@ import org.matsim.freight.logistics.LogisticChain;
     LSPUtils.setVariableCost(this.logisticChain, linearUnitCosts);
   }
 
+
+  /* Resets all accumulated cost and shipment counters at the start of an iteration. */
   @Override
-  /** Resets all accumulated cost and shipment counters at the start of an iteration. */
   public void reset(int iteration) {
     distanceCosts = 0;
     timeCosts = 0;
@@ -122,8 +127,9 @@ import org.matsim.freight.logistics.LogisticChain;
     linearUnitCosts = 0;
   }
 
+
+  /* Sets the {@link LogisticChain} that this tracker is evaluating. */
   @Override
-  /** Sets the {@link LogisticChain} that this tracker is evaluating. */
   public void setEmbeddingContainer(LogisticChain pointer) {
     this.logisticChain = pointer;
   }

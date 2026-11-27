@@ -54,8 +54,11 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CollectionLSPScoringTest {
+	private static final Logger log = LogManager.getLogger(CollectionLSPScoringTest.class);
 
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -165,7 +168,7 @@ public class CollectionLSPScoringTest {
 
 	@Test
 	public void testCollectionLSPScoring() {
-		System.out.println(collectionLSP.getSelectedPlan().getScore());
+		log.info(collectionLSP.getSelectedPlan().getScore());
 		assertEquals(numberOfShipments, collectionLSP.getLspShipments().size());
 		assertEquals(numberOfShipments, collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLspShipmentIds()
 				.size());

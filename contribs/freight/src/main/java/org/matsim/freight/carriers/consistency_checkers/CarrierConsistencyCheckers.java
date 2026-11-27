@@ -296,9 +296,7 @@ public class CarrierConsistencyCheckers {
 				//if map is not empty, at least one job cannot be executed.
 				isCarrierCapable.put(carrier.getId(), false);
 				log.log(level,"Carrier '{}': there is at least one job without feasible vehicle available (operation time of the vehicle does not fit to the time-windows of the job)", carrier.getId().toString());
-				nonFeasibleJob.forEach((jobId, reason) -> {
-					log.log(level,"Job '{}' can not be handled by carrier '{}'. Reason: {}", jobId.toString(), carrier.getId().toString(), reason);
-				});
+				nonFeasibleJob.forEach((jobId, reason) -> log.log(level,"Job '{}' can not be handled by carrier '{}'. Reason: {}", jobId.toString(), carrier.getId().toString(), reason));
 			}
 		}
 

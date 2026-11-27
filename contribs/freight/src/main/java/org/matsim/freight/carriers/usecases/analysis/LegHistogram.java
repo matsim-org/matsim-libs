@@ -57,7 +57,7 @@ import org.matsim.core.utils.misc.Time;
  * It is a copy of {@link org.matsim.analysis.LegHistogram}. It is modified to include or exclude persons.
  *
  * @author mrieser
- *
+ * <p>
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */

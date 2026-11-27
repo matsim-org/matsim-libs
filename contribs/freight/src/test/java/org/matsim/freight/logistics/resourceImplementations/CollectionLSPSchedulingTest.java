@@ -21,7 +21,6 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.matsim.freight.logistics.LSPConstants.*;
 import static org.matsim.freight.logistics.shipment.LspShipmentPlanElement.ElementType.*;
 
 import java.util.ArrayList;
@@ -50,8 +49,11 @@ import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CollectionLSPSchedulingTest {
+	private static final Logger log = LogManager.getLogger(CollectionLSPSchedulingTest.class);
 
 	private LSP collectionLSP;
 	private LSPResource collectionResource;
@@ -155,11 +157,10 @@ public class CollectionLSPSchedulingTest {
 			ArrayList<LspShipmentPlanElement> scheduleElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
 
-			System.out.println();
+			log.info("Shipment: {}", shipment.getId());
 			for (int i = 0; i < LspShipmentUtils.getOrCreateShipmentPlan(collectionLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size(); i++) {
-				System.out.println("Scheduled: " + scheduleElements.get(i).getLogisticChainElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
-			}
-			System.out.println();
+				log.info("Scheduled: " + scheduleElements.get(i).getLogisticChainElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());			}
+
 		}
 
 		for (LspShipment shipment : collectionLSP.getLspShipments()) {

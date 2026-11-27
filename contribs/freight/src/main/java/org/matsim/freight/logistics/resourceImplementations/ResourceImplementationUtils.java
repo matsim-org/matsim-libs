@@ -92,15 +92,15 @@ public class ResourceImplementationUtils {
    * @param lsp the LSP, for which the shipments should be written out
    */
   public static void printShipmentsOfLSP(String outputDir, LSP lsp) {
-    System.out.println("Writing out shipments of LSP");
+    log.info("Writing out shipments of LSP");
     try (BufferedWriter writer =
         IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_shipments.tsv")) {
       final String str0 = "LSP: " + lsp.getId();
-      System.out.println(str0);
+      log.info(str0);
       writer.write(str0 + "\n");
       for (LspShipment lspShipment : lsp.getLspShipments()) {
         final String str1 = "Shipment: " + lspShipment;
-        System.out.println(str1);
+        log.info(str1);
         writer.write(str1 + "\n");
       }
     } catch (IOException e) {
@@ -116,11 +116,11 @@ public class ResourceImplementationUtils {
    * @param lsp the LSP, for which the shipmentPlan should be written out
    */
   public static void printResults_shipmentPlan(String outputDir, LSP lsp) {
-    System.out.println("Writing out shipmentPlan for LSP");
+    log.info("Writing out shipmentPlan for LSP");
     try (BufferedWriter writer =
         IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_schedules.tsv")) {
       final String str0 = "LSP: " + lsp.getId();
-      System.out.println(str0);
+      log.info(str0);
       writer.write(str0 + "\n");
       for (LspShipment shipment : lsp.getLspShipments()) {
         ArrayList<LspShipmentPlanElement> elementList =
@@ -140,7 +140,7 @@ public class ResourceImplementationUtils {
           BufferedWriter writer, LspShipment lspShipment, ArrayList<LspShipmentPlanElement> elementList)
       throws IOException {
     final String str1 = "Shipment: " + lspShipment;
-    System.out.println(str1);
+    log.info(str1);
     writer.write(str1 + "\n");
     for (LspShipmentPlanElement element : elementList) {
       final String str2 =
@@ -153,10 +153,10 @@ public class ResourceImplementationUtils {
               + element.getStartTime()
               + "\t\t"
               + element.getEndTime();
-      System.out.println(str2);
+      log.info(str2);
       writer.write(str2 + "\n");
     }
-    System.out.println();
+    log.info("");
     writer.write("\n");
   }
 
@@ -168,11 +168,11 @@ public class ResourceImplementationUtils {
    * @param lsp the LSP, for which the shipment logs should be written out.
    */
   public static void printResults_shipmentLog(String outputDir, LSP lsp) {
-    System.out.println("Writing out shipmentLog for LSP");
+    log.info("Writing out shipmentLog for LSP");
     try (BufferedWriter writer =
         IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_shipmentLogs.tsv")) {
       final String str0 = "LSP: " + lsp.getId();
-      System.out.println(str0);
+      log.info(str0);
       writer.write(str0 + "\n");
       for (LspShipment lspShipment : lsp.getLspShipments()) {
         ArrayList<LspShipmentPlanElement> elementList =
@@ -186,11 +186,11 @@ public class ResourceImplementationUtils {
   }
 
   public static void printScores(String outputDir, LSP lsp) {
-    System.out.println("Writing out scores for LSP");
+    log.info("Writing out scores for LSP");
     try (BufferedWriter writer =
         IOUtils.getBufferedWriter(outputDir + "/" + lsp.getId().toString() + "_scores.tsv")) {
       final String str0 = "LSP: " + lsp.getId();
-      System.out.println(str0);
+      log.info(str0);
       writer.write(str0 + "\n");
       final String str1 =
           "The LSP `` "
@@ -198,17 +198,17 @@ public class ResourceImplementationUtils {
               + " ´´ has the following number of plans: "
               + lsp.getPlans().size()
               + "\n The scores are: ";
-      System.out.println(str1);
+      log.info(str1);
       writer.write(str1 + "\n");
       for (LSPPlan plan : lsp.getPlans()) {
         final String str2 = "Score: " + plan.getScore().toString();
-        System.out.println(str2);
+        log.info(str2);
         writer.write(str2 + "\n");
       }
       final String str3 = "The selected plan has the score: " + lsp.getSelectedPlan().getScore();
-      System.out.println(str3);
+      log.info(str3);
       writer.write(str3 + "\n");
-      System.out.println("###");
+      log.info("###");
       writer.write("### \n");
 
     } catch (IOException e) {

@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -52,6 +54,8 @@ import org.matsim.vehicles.VehicleUtils;
  * collection LSP and reads back the computed cost function.
  */
 /*package-private*/ class ExampleSimulationTrackers {
+
+  private static final Logger log = LogManager.getLogger(ExampleSimulationTrackers.class);
 
   /*package-private*/
   static LSP createLSPWithTracker(Scenario scenario) {
@@ -212,7 +216,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     // Retrieve cost info from lsp
       for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
-      System.out.println(chain.getAttributes().getAttribute("cost_function"));
+      log.info("cost_function: {}", chain.getAttributes().getAttribute("cost_function"));
     }
   }
 }

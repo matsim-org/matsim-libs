@@ -41,9 +41,12 @@ import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.vehicles.Vehicle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Disabled
 public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
+	private static final Logger log = LogManager.getLogger(TimeScoringFunctionFactoryForTests.class);
 
 	static class DriverLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
@@ -149,16 +152,16 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		private void startActivity(double time, Activity act) {
 			if(!act.getType().equals(CarrierConstants.END)){
-				System.out.println("act_start="+ Time.writeTime(time)+" act="+act);
+				log.info("act_start="+ Time.writeTime(time)+" act="+act);
 				startCurrentAct = time;
 			}
 		}
 
 		private void endActivity(double time, Activity act) {
 			if(!act.getType().equals("start")){
-				System.out.println("act_end="+Time.writeTime(time)+" act="+act);
+				log.info("act_end="+Time.writeTime(time)+" act="+act);
 				time_at_activities += time - startCurrentAct;
-				System.out.println("time_at_activities="+time_at_activities);
+				log.info("time_at_activities="+time_at_activities);
 			}
 		}
 

@@ -10,7 +10,6 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.freight.carriers.Carrier;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -28,10 +27,8 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 	private double algorithmStartTime;
 	private int removedJobsWhileRuin;
 	private int routesAfterRuin;
-	private final Carrier carrier;
 
-	public JspritStrategyAnalyzer(Carrier carrier) {
-		this.carrier = carrier;
+	public JspritStrategyAnalyzer() {
 		iterationSolutionCosts = new LinkedHashMap<>();
 		foundNewBestSolutions = new TreeMap<>();
 
