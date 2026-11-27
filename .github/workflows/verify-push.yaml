@@ -102,7 +102,7 @@ jobs:
       - name: Restore Maven repository
         # saved by prime-cache, so the matrix jobs don't each download from Maven Central
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: ~/.m2/repository
           key: ${{ needs.prime-cache.outputs.cache-key }}

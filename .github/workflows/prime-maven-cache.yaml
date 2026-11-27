@@ -60,7 +60,7 @@ jobs:
       - name: Restore Maven repository
         id: restore
         if: ${{ !inputs.cold-cache }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: ~/.m2/repository
           key: ${{ steps.key.outputs.key }}
@@ -83,7 +83,7 @@ jobs:
 
       - name: Save Maven repository
         if: ${{ steps.restore.outputs.cache-hit != 'true' && !inputs.cold-cache }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.m2/repository
           key: ${{ steps.key.outputs.key }}
