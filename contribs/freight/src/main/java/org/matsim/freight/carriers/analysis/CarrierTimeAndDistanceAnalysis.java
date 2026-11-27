@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -315,12 +316,24 @@ import org.matsim.vehicles.VehicleUtils;
 		}
 	}
 
+	/**
+	 * Shared, behavior-neutral scaffolding for the three analysis writers. Resolves the output file,
+	 * streams the {@link BufferedWriter} into the given {@code body} and handles the close/error path
+	 * once, so the callers only differ in the data they write.
+	 */
+	private void writeAnalysis(String fileName, Consumer<BufferedWriter> body) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+			body.accept(bw);
+		} catch (IOException e) {
+			log.error("Error writing to file: {}", fileName, e);
+		}
+	}
+
 	/*package-private*/ void writeTravelTimeAndDistancePerCarrier(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out Time & Distance & Costs ... perCarrier");
 		//Travel time and distance per vehicle
 		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perCarrier.tsv").toString();
-
-		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
+		writeAnalysis(fileName, bw1 -> {
 			//Write headline:
 			bw1.write(String.join(delimiter,
 				"carrierId",
@@ -381,19 +394,15 @@ import org.matsim.vehicles.VehicleUtils;
 				bw1.write(delimiter + totalVehCosts);
 				bw1.newLine();
 			}
-			bw1.close();
 			log.info("Carrier event analysis output written to {}", fileName);
-		} catch (IOException e) {
-			log.error("Error writing to file: {}", fileName, e);
-		}
+		});
 	}
 
 	/*package-private*/ void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
 		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perVehicle.tsv").toString();
-
-		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
+		writeAnalysis(fileName, bw1 -> {
 			//Write headline:
 			bw1.write(String.join(delimiter,
 				"vehicleId",
@@ -454,11 +463,8 @@ import org.matsim.vehicles.VehicleUtils;
 				bw1.newLine();
 			}
 
-			bw1.close();
 			log.info("Vehicle event analysis output written to {}", fileName);
-		} catch (IOException e) {
-			log.error("Error writing to file: {}", fileName, e);
-		}
+		});
 	}
 
 	/*package-private*/ void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) {
@@ -472,8 +478,7 @@ import org.matsim.vehicles.VehicleUtils;
 		}
 
 		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perVehicleType.tsv").toString();
-
-		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
+		writeAnalysis(fileName, bw1 -> {
 			//Write headline:
 			bw1.write(String.join(delimiter,
 				"vehicleTypeId",
@@ -538,10 +543,7 @@ import org.matsim.vehicles.VehicleUtils;
 				bw1.newLine();
 			}
 
-			bw1.close();
 			log.info("VehicleType event analysis output written to {}", fileName);
-		} catch (IOException e) {
-			log.error("Error writing to file: {}", fileName, e);
-		}
+		});
 	}
 }
