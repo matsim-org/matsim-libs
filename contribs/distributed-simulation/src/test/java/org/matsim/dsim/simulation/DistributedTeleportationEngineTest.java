@@ -42,7 +42,7 @@ class DistributedTeleportationEngineTest {
 		leg.setTravelTime(42);
 		leg.setRoute(new GenericRouteImpl(Id.createLinkId("l1"), Id.createLinkId("l2")));
 		plan.addLeg(leg);
-		var msg = new BasicPlanAgentImpl.BasicPlanAgentMessage(person.getId(), plan.getPlanElements(), 0, 0, MobsimAgent.State.ACTIVITY, Id.createLinkId("bla"), 0);
+		var msg = new BasicPlanAgentImpl.BasicPlanAgentMessage(person.getId(), plan.getPlanElements(), 0, 0, 0, MobsimAgent.State.ACTIVITY, Id.createLinkId("bla"), 0);
 
 		return new BasicPlanAgentImpl(msg, scenario, em, timer, timeInterpretation);
 	}
