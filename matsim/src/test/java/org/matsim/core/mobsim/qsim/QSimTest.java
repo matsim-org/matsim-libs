@@ -1668,7 +1668,7 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assertions.assertEquals(2979, volume[6]); // because of the kinematic waves and the 'increase lanes behavior' we should only have slightly less than half of the maximum flow in this hour
+		Assertions.assertEquals(2980, volume[6]); // because of the kinematic waves and the 'increase lanes behavior' we should only have slightly less than half of the maximum flow in this hour
 		Assertions.assertEquals(5958, volume[7]); // because of the kinematic waves and the 'increase lanes behavior' we should only have slightly less than the maximum flow in this hour
 	}
 
@@ -1729,7 +1729,7 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assertions.assertEquals(961, volume[6]); // because of the kinematic waves and the 'use inflow capacity of one lane only behavior' we should have less than a quarter of the maximum flow in this hour
+		Assertions.assertEquals(960, volume[6]); // because of the kinematic waves and the 'use inflow capacity of one lane only behavior' we should have less than a quarter of the maximum flow in this hour
 		Assertions.assertEquals(1920, volume[7]);  // because of the kinematic waves and the 'use inflow capacity of one lane only behavior' we should have less than half of the maximum flow in this hour
 	}
 

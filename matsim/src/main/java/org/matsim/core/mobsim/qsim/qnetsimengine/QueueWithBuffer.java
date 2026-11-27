@@ -195,7 +195,16 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double maxInflowUsedInQsim = Double.POSITIVE_INFINITY;
 	private double effectiveNumberOfLanesUsedInQsim = Double.POSITIVE_INFINITY;
 
-	private double accumulatedInflowCap = 1.;
+	/**
+	 * Starts full, i.e. at {@link #maxInflowUsedInQsim}, see the constructor.
+	 */
+	private double accumulatedInflowCap;
+
+	/**
+	 * The time step up to which {@link #accumulatedInflowCap} has been refilled, see {@link #catchUpInflowCapacity(double)}. Starts one time
+	 * step before 0, see the constructor.
+	 */
+	private double lastInflowCapRefillTime;
 
 	private final FlowEfficiencyCalculator flowEfficiencyCalculator;
 
@@ -225,6 +234,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		this.calculateStorageCapacity();
 
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
+		// the inflow capacity starts full. It started at 1 before, which is more than it is ever refilled to
+		// if maxInflowUsedInQsim < 1, so that the first vehicle on a link was followed sooner than any later one. The refill of time step 0 is
+		// still due, so that a vehicle entering at 0 is followed by a refill in doSimStep, as at any other time.
+		this.accumulatedInflowCap = this.maxInflowUsedInQsim;
+		this.lastInflowCapRefillTime = -context.qsimConfig.getTimeStepSize();
 	}
 
 	private void addToBuffer(final QVehicle veh) {
@@ -404,14 +418,13 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
 
-				/* We think the maxFlowFromFdiag should be scaled with the flow capacity factor because this scales how much flow can be send/received per time.
-				* It's unit is (veh/m) / (1/ m/s) = (veh/m) / (s/m) = veh/s
-				* Unfortunately, there are no tests failing when we make changes here, i.e. the qsim behavior with kinematic waves seems to be not
-				* suitable covered by tests. Still, simulation outcome of the Berlin scenario differs a lot when we multiply the flow capacity factor
-				* here (car mode shares go significantly down!). This has to be investigated further! For now, we leave the inflow capacity (unscaled)
-				* as before.
-				* tilmann, theresa + christian, feb+mar'25 */
-				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize)
+				/* The max flow from the fundamental diagram is in vehicles of the full population per second, (veh/m) / (s/m) = veh/s. It is
+				* scaled with the flow capacity factor like the flow and storage capacities, so that a sample behaves like the full population.
+				* DSim gets the same by scaling the pce of the vehicles instead. Without the scaling, the inflow capacity of a 10 % sample
+				* allowed 10 times the flow of the fundamental diagram and practically never limited the flow.
+				* This was done in #3770 and reverted in #3845, because the car mode share of the Berlin scenario went down a lot. Then, the
+				* inflow capacity was not refilled while a link was inactive (#5239), which became much more frequent with the scaling. */
+				final double maxFlowFromFdiag = (context.qsimConfig.getFlowCapFactor() * this.effectiveNumberOfLanes/context.effectiveCellSize)
 					/ ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLinkInternalInterface.getFreespeed() );
 
@@ -429,7 +442,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 						}
 					}
 
-					this.maxInflowUsedInQsim = (1 / context.effectiveCellSize) / (1. / (HOLE_SPEED_KM_H / 3.6) + 1 / this.qLinkInternalInterface.getFreespeed());
+					// scaled as maxFlowFromFdiag
+					this.maxInflowUsedInQsim = (context.qsimConfig.getFlowCapFactor() / context.effectiveCellSize) / (1. / (HOLE_SPEED_KM_H / 3.6) + 1 / this.qLinkInternalInterface.getFreespeed());
 					// write out the modified qsim behavior as link attribute
 					qLinkInternalInterface.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600 * maxInflowUsedInQsim / context.qsimConfig.getTimeStepSize());
 
@@ -582,7 +596,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				this.processArrivalOfHoles();
 				break;
 			case kinematicWaves:
-				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxInflowUsedInQsim, maxInflowUsedInQsim);
+				this.catchUpInflowCapacity(context.getSimTimer().getTimeOfDay());
 				this.processArrivalOfHoles();
 				break;
 			default:
@@ -590,6 +604,28 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		this.moveQueueToBuffer();
 		return true;
+	}
+
+	/**
+	 * With kinematic waves, the inflow capacity is refilled by {@code maxInflowUsedInQsim} per time step, up to {@code maxInflowUsedInQsim}.
+	 * {@link #doSimStep()} is only called while the link is active, and {@link #isActive()} does not keep the link active for that. A vehicle
+	 * may consume more inflow capacity than the link refills while the vehicle is on it, e.g. a truck on a short link, so that the link goes
+	 * inactive with a negative inflow capacity. Without catching up, the link would then reject every vehicle from upstream until the stuck
+	 * time, see <a href="https://github.com/matsim-org/matsim-libs/issues/5239">#5239</a>.
+	 * <p>
+	 * So the refills of the time steps in which the link was not processed are caught up from the elapsed time, as
+	 * {@link #updateFastFlowAccumulation()} does for the flow capacity, instead of keeping the link active. As the ceiling is the same in every
+	 * time step, catching up n time steps at once gives the same value as n single refills.
+	 *
+	 * @param until the last time step whose refill is due
+	 */
+	private void catchUpInflowCapacity(double until) {
+		if (this.lastInflowCapRefillTime >= until) {
+			return;
+		}
+		double timeSteps = (until - this.lastInflowCapRefillTime) / context.qsimConfig.getTimeStepSize();
+		this.accumulatedInflowCap = Math.min(this.accumulatedInflowCap + timeSteps * this.maxInflowUsedInQsim, this.maxInflowUsedInQsim);
+		this.lastInflowCapRefillTime = until;
 	}
 
 	private void processArrivalOfHoles() {
@@ -647,6 +683,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				break;
 			case kinematicWaves:
 				this.remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
+				// catch up the time steps since lastInflowCapRefillTime before consuming, as the refill is capped. A no-op if
+				// isAcceptingFromUpstream was called before in this time step. The refill of this time step follows in doSimStep.
+				this.catchUpInflowCapacity(now - context.qsimConfig.getTimeStepSize());
 				double flowConsumption = (lastQueueEntry == null) ?
 					getFlowCapacityConsumptionInEquivalents(veh, null, null) : getFlowCapacityConsumptionInEquivalents(veh, lastQueueEntry.getKey(), now - lastQueueEntry.getValue());
 				this.accumulatedInflowCap -= flowConsumption;
@@ -760,6 +799,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			return true;
 		}
 
+		// an inactive link has not been processed since lastInflowCapRefillTime, so catch up those time steps. Otherwise, it would reject
+		// vehicles with a negative inflow capacity and never become active again to refill it. The refill of this time step follows in
+		// doSimStep, as nodes are processed before links.
+		this.catchUpInflowCapacity(context.getSimTimer().getTimeOfDay() - context.qsimConfig.getTimeStepSize());
 		return this.accumulatedInflowCap > 0;
 
 	}
@@ -772,6 +815,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 //		log.debug("just entered recalcTimeVariantAttributes; now=" + this.context.getSimTimer().getTimeOfDay() ) ;
 
+		// the inflow capacity of the time steps before the change is refilled with the capacity from before the change. Network change events
+		// are applied before the time step (MessageQueueEngine is a MobsimBeforeSimStepListener).
+		this.catchUpInflowCapacity(context.getSimTimer().getTimeOfDay() - context.qsimConfig.getTimeStepSize());
 		calculateFlowCapacity();
 		calculateStorageCapacity();
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
