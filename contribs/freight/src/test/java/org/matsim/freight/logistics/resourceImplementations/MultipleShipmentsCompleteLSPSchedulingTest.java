@@ -292,11 +292,10 @@ public class MultipleShipmentsCompleteLSPSchedulingTest {
 		for (LspShipment shipment : lsp.getLspShipments()) {
 			ArrayList<LspShipmentPlanElement> elementList = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			elementList.sort(LspShipmentUtils.createShipmentPlanElementComparator());
-			log.info();
+			log.info("Shipment: {}", shipment.getId());
 			for (LspShipmentPlanElement element : elementList) {
 				log.info(element.getLogisticChainElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime());
 			}
-			log.info();
 		}
 
 		ArrayList<LogisticChainElement> chainElements = new ArrayList<>(lsp.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements());

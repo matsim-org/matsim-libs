@@ -254,11 +254,10 @@ public class SecondReloadLSPSchedulingTest {
 		for (LspShipment shipment : lsp.getLspShipments()) {
 			ArrayList<LspShipmentPlanElement> elementList = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			elementList.sort(LspShipmentUtils.createShipmentPlanElementComparator());
-			log.info();
+			log.info("Shipment: {}", shipment.getId());
 			for (LspShipmentPlanElement element : elementList) {
 				log.info(element.getLogisticChainElement().getId() + " " + element.getResourceId() + " " + element.getElementType() + " " + element.getStartTime() + " " + element.getEndTime());
 			}
-			log.info();
 		}
 
 		for (LspShipment shipment : lsp.getLspShipments()) {

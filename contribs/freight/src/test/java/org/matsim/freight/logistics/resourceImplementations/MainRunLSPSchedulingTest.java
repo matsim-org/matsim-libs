@@ -231,11 +231,10 @@ public class MainRunLSPSchedulingTest {
 			ArrayList<LspShipmentPlanElement> scheduleElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			scheduleElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
 
-			log.info();
+			log.info("Shipment: {}", shipment.getId());
 			for (int i = 0; i < LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size(); i++) {
-				log.info("Scheduled: " + scheduleElements.get(i).getLogisticChainElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
-			}
-			log.info();
+				log.info("Scheduled: " + scheduleElements.get(i).getLogisticChainElement().getId() + "  " + scheduleElements.get(i).getResourceId() + "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());			}
+
 		}
 
 

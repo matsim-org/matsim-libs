@@ -327,11 +327,13 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 						for (int j = 0; j < LspShipmentUtils.getOrCreateShipmentPlan(completeLSP.getSelectedPlan(), shipment.getId()).getPlanElements().size(); j++) {
 							log.info("Scheduled: " + scheduleElements.get(j).getLogisticChainElement().getId() + "  " + scheduleElements.get(j).getResourceId() + "  " + scheduleElements.get(j).getElementType() + " Start: " + scheduleElements.get(j).getStartTime() + " End: " + scheduleElements.get(j).getEndTime());
 						}
-						log.info();
+							log.info("Scheduled:");
+
 						for (int j = 0; j < shipment.getShipmentLog().getPlanElements().size(); j++) {
 							log.info("Logged: " + logElements.get(j).getLogisticChainElement().getId() + "  " + logElements.get(j).getResourceId() + "  " + logElements.get(j).getElementType() + " Start: " + logElements.get(j).getStartTime() + " End: " + logElements.get(j).getEndTime());
 						}
-						log.info();
+							log.info("Logged:");
+
 					}
 
 					assertEquals(scheduleElement.getElementType(), logElement.getElementType());
