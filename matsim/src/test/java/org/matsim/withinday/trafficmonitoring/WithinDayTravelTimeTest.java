@@ -223,9 +223,13 @@ public class WithinDayTravelTimeTest {
 			} else if (time == t2) {
 				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null), 0);
 			} else if (time == t3) {
-				assertEquals(467.6756756756757, travelTime.getLinkTravelTime(link, t3, null, null), 0);
+				// while the queue on the link builds up, the vehicle that has been on the link longest has been on it for
+				// longer than the recently completed trips took (mean would be 467.6756756756757). This trip in progress
+				// is a lower bound for the travel time.
+				assertEquals(596.0, travelTime.getLinkTravelTime(link, t3, null, null), 0);
 			} else if (time == t4) {
-				assertEquals(612.6282051282051, travelTime.getLinkTravelTime(link, t4, null, null), 0);
+				// same as above (mean would be 612.6282051282051)
+				assertEquals(892.0, travelTime.getLinkTravelTime(link, t4, null, null), 0);
 			} else if (time == t5) {
 				assertEquals(690.62, travelTime.getLinkTravelTime(link, t5, null, null), 0);
 			} else if (time == t6) {
