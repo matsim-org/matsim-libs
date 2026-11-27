@@ -32,7 +32,7 @@ public class SimWrapperModuleTest {
 		controler.run();
 
 		//default ones + TestDashboard
-		assertDashboardFiles(5);
+		assertDashboardFiles(6);
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class SimWrapperModuleTest {
 		controler.run();
 
 		//default ones + test dashboard
-		assertDashboardFiles(5);
+		assertDashboardFiles(6);
 		testDashboard.assertCalled();
 	}
 
@@ -100,7 +100,7 @@ public class SimWrapperModuleTest {
 		controler.addOverridingModule(new SimWrapperModule());
 		controler.run();
 
-		assertDashboardFiles(5);
+		assertDashboardFiles(6);
 	}
 
 	@Test

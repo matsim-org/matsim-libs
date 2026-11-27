@@ -42,6 +42,9 @@ public @interface CommandSpec {
 	 */
 	boolean requireRunDirectory() default false;
 
+	/** Whether required files may be resolved from the run directory when not given explicitly. */
+	boolean autoResolveInputs() default false;
+
 	/**
 	 * List of files names that are produces by this command and accessible by others as input.
 	 */
